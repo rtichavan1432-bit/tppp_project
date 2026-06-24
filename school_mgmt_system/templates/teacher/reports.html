@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Reports - Teacher Management Portal{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-12">
+        <div class="stat-card">
+            <h4 class="fw-bold mb-2">Export Reports</h4>
+            <p class="text-muted mb-0">Download spreadsheet-style ERP reports for attendance, fees, exam results, and consolidated student results.</p>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <a href="{{ url_for('main.report_attendance') }}" class="quick-action h-100">
+            <i class="fas fa-clipboard-check"></i>
+            <h6>Attendance Report</h6>
+            <p class="text-muted mb-0 mt-2">Attendance.xlsx</p>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <a href="{{ url_for('main.report_fees') }}" class="quick-action h-100">
+            <i class="fas fa-rupee-sign"></i>
+            <h6>Fees Report</h6>
+            <p class="text-muted mb-0 mt-2">Fees.xlsx</p>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <form method="GET" action="{{ url_for('main.report_exam_result') }}" class="quick-action h-100">
+            <i class="fas fa-chart-bar"></i>
+            <h6>Exam Result Report</h6>
+            <select name="exam_id" class="form-select mt-3 mb-3" required>
+                <option value="">Select Exam</option>
+                {% for exam in exams %}
+                <option value="{{ exam.id }}">{{ exam.name }}{% if exam.exam_date %} - {{ exam.exam_date }}{% endif %}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary w-100">Download</button>
+        </form>
+    </div>
+
+    <div class="col-md-6 col-xl-3">
+        <a href="{{ url_for('main.report_students') }}" class="quick-action h-100">
+            <i class="fas fa-user-graduate"></i>
+            <h6>Consolidated Student Result</h6>
+            <p class="text-muted mb-0 mt-2">Student_Report.xlsx</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

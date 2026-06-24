@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Results - School Manager{% endblock %}
+{% block page_title %}Results: {{ exam.name }}{% endblock %}
+{% block content %}
+<div class="mb-4 d-flex justify-content-between align-items-center">
+    <a href="{{ url_for('main.exams') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Back to Exams
+    </a>
+    <a href="{{ url_for('main.report_marks', exam_id=exam.id) }}" class="btn btn-success btn-sm">
+        <i class="fas fa-file-excel me-2"></i>Download Excel
+    </a>
+</div>
+
+<div class="table-card">
+    <div class="card-header">
+        <h5 class="m-0">{{ exam.name }} - Results</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Marks</th>
+                    <th>Percentage</th>
+                    <th>Grade</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                <tr>
+                    <td><span class="badge bg-warning text-dark fw-bold">#{{ r.rank }}</span></td>
+                    <td>{{ r.roll_no }}</td>
+                    <td><i class="fas fa-user text-muted me-2"></i>{{ r.name }}</td>
+                    <td><strong>{{ r.marks_obtained }}/{{ exam.max_marks }}</strong></td>
+                    <td>{{ r.percentage }}%</td>
+                    <td>
+                        {% if r.grade == 'A+' %}
+                            <span class="grade-a-plus">{{ r.grade }}</span>
+                        {% elif r.grade == 'A' %}
+                            <span class="grade-a">{{ r.grade }}</span>
+                        {% elif r.grade == 'B' %}
+                            <span class="grade-b">{{ r.grade }}</span>
+                        {% elif r.grade == 'C' %}
+                            <span class="grade-c">{{ r.grade }}</span>
+                        {% else %}
+                            <span class="grade-f">{{ r.grade }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ r.remark }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

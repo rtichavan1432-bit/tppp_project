@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Marks Entry - Teacher Management Portal{% endblock %}
+{% block page_title %}Marks Entry{% endblock %}
+{% block content %}
+<style>
+    .sheet-toolbar {
+        position: sticky;
+        top: 72px;
+        z-index: 20;
+        background: #fff;
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+    .sheet-table thead th {
+        position: sticky;
+        top: 140px;
+        z-index: 15;
+        background: #f8fafc;
+    }
+    .sheet-table td,
+    .sheet-table th {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    .sheet-table input.form-control {
+        min-width: 92px;
+        text-align: center;
+    }
+    .subject-header {
+        min-width: 110px;
+    }
+</style>
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+    <div>
+        <a href="{{ url_for('main.exams') }}" class="btn btn-outline-secondary btn-sm mb-2">
+            <i class="fas fa-arrow-left me-1"></i>Back to Exams
+        </a>
+        <h4 class="fw-bold mb-1">{{ exam.name }}</h4>
+        <p class="text-muted mb-0">Maximum Marks per Subject: {{ exam.max_marks }}</p>
+    </div>
+    <div class="text-end">
+        <span class="badge bg-primary fs-6 px-3 py-2 me-2">{{ subjects|length }} Subjects</span>
+        <span class="badge bg-dark fs-6 px-3 py-2">{{ students|length }} Students</span>
+    </div>
+</div>
+
+<div class="sheet-toolbar d-flex flex-wrap gap-2 align-items-center justify-content-between">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <input type="search" id="studentSearch" class="form-control" style="min-width: 260px;" placeholder="Search student or roll no">
+        <button type="button" class="btn btn-outline-primary" id="editAllBtn">
+            <i class="fas fa-pen me-1"></i>Edit All
+        </button>
+    </div>
+    <button type="submit" form="marksForm" class="btn btn-primary px-4">
+        <i class="fas fa-save me-1"></i>Save All
+    </button>
+</div>
+
+<form method="POST" id="marksForm">
+    <div class="table-card">
+        <div class="table-responsive">
+            <table class="table sheet-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        {% for subject in subjects %}
+                        <th class="subject-header">{{ subject.name }}</th>
+                        {% endfor %}
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr data-search="{{ student.roll_no }} {{ student.name|lower }}">
+                        <td class="fw-semibold">{{ student.roll_no }}</td>
+                        <td class="student-name">{{ student.name }}</td>
+                        {% set row_total = namespace(value=0) %}
+                        {% for subject in subjects %}
+                        {% set cell_value = existing_marks.get((student.id, subject.id)) %}
+                        <td>
+                            <input
+                                type="number"
+                                step="0.5"
+                                min="0"
+                                max="{{ exam.max_marks }}"
+                                class="form-control mark-input"
+                                data-student="{{ student.id }}"
+                                data-subject="{{ subject.id }}"
+                                name="mark_{{ student.id }}_{{ subject.id }}"
+                                value="{{ cell_value if cell_value is not none else '' }}"
+                                readonly
+                            >
+                            {% if cell_value is not none %}
+                                {% set row_total.value = row_total.value + cell_value %}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                        <td>
+                            <strong class="row-total">{{ row_total.value }}</strong>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="{{ subjects|length + 3 }}" class="text-center text-muted py-5">No students found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+<script>
+    const editAllBtn = document.getElementById('editAllBtn');
+    const markInputs = Array.from(document.querySelectorAll('.mark-input'));
+    const studentSearch = document.getElementById('studentSearch');
+
+    function calculateRowTotal(studentId) {
+        let total = 0;
+        document.querySelectorAll(`.mark-input[data-student="${studentId}"]`).forEach((input) => {
+            const value = parseFloat(input.value);
+            if (!Number.isNaN(value)) {
+                total += value;
+            }
+        });
+        const row = document.querySelector(`.mark-input[data-student="${studentId}"]`)?.closest('tr');
+        if (row) {
+            row.querySelector('.row-total').textContent = total.toFixed(2).replace(/\.00$/, '');
+        }
+    }
+
+    function updateAllTotals() {
+        const seen = new Set();
+        markInputs.forEach((input) => {
+            if (!seen.has(input.dataset.student)) {
+                seen.add(input.dataset.student);
+                calculateRowTotal(input.dataset.student);
+            }
+        });
+    }
+
+    editAllBtn.addEventListener('click', () => {
+        markInputs.forEach((input) => input.removeAttribute('readonly'));
+    });
+
+    markInputs.forEach((input) => {
+        input.addEventListener('input', () => calculateRowTotal(input.dataset.student));
+    });
+
+    studentSearch.addEventListener('input', () => {
+        const term = studentSearch.value.trim().toLowerCase();
+        document.querySelectorAll('tbody tr[data-search]').forEach((row) => {
+            row.style.display = row.dataset.search.includes(term) ? '' : 'none';
+        });
+    });
+
+    updateAllTotals();
+</script>
+{% endblock %}

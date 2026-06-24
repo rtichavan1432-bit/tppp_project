@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Profile - Teacher Management Portal{% endblock %}
+{% block page_title %}Profile{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="stat-card h-100">
+            <div class="text-center mb-4">
+                <div style="width: 88px; height: 88px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700;">
+                    {{ (teacher.name or teacher.username)[0].upper() }}
+                </div>
+                <h4 class="fw-bold mt-3 mb-1">{{ teacher.name or 'Teacher' }}</h4>
+                <p class="text-muted mb-0">{{ teacher.username }}</p>
+            </div>
+            <div class="d-grid gap-3">
+                <div class="p-3 rounded bg-light">
+                    <strong class="d-block">School</strong>
+                    <span class="text-muted">{{ teacher.school_name or '-' }}</span>
+                </div>
+                <div class="p-3 rounded bg-light">
+                    <strong class="d-block">Class & Division</strong>
+                    <span class="text-muted">{{ teacher.class_name or '-' }} {{ teacher.division or '' }}</span>
+                </div>
+                <div class="p-3 rounded bg-light">
+                    <strong class="d-block">Academic Year</strong>
+                    <span class="text-muted">{{ teacher.academic_year or '-' }}</span>
+                </div>
+                <div class="p-3 rounded bg-light">
+                    <strong class="d-block">Subjects</strong>
+                    <span class="text-muted">
+                        {% if subjects %}
+                            {% for subject in subjects %}{{ subject.name }}{% if not loop.last %}, {% endif %}{% endfor %}
+                        {% else %}
+                            No subjects added
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header">
+                <h5><i class="fas fa-user-edit me-2 text-primary"></i>Manage Profile</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Teacher Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ teacher.name or '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">School Name</label>
+                            <input type="text" name="school_name" class="form-control" value="{{ teacher.school_name or '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="mobile" class="form-control" value="{{ teacher.mobile or '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Academic Year</label>
+                            <input type="text" name="academic_year" class="form-control" value="{{ teacher.academic_year or '' }}" placeholder="2026-2027" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Class</label>
+                            <input type="text" name="class_name" class="form-control" value="{{ teacher.class_name or '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Division</label>
+                            <input type="text" name="division" class="form-control" value="{{ teacher.division or '' }}" required>
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="submit" class="btn btn-primary px-4">Save Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

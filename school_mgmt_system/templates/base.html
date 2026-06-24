@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Manager{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --accent: #22c55e;
+            --bg-light: #f1f5f9;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 70px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #fff;
+            border-right: 1px solid #e2e8f0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .sidebar-header h4 {
+            color: var(--primary);
+            font-weight: 700;
+            margin: 0;
+        }
+        .sidebar-header small {
+            color: var(--secondary);
+            font-size: 0.75rem;
+        }
+        .nav-menu { padding: 10px 0; }
+        .nav-item { list-style: none; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #eff6ff;
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+        .nav-link i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        .topbar {
+            background: #fff;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar h5 { margin: 0; color: #1e293b; font-weight: 600; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .content-area { padding: 30px; }
+        .stat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+        .stat-icon.blue { background: #dbeafe; color: var(--primary); }
+        .stat-icon.green { background: #dcfce7; color: var(--accent); }
+        .stat-icon.orange { background: #ffedd5; color: #f97316; }
+        .stat-icon.purple { background: #f3e8ff; color: #a855f7; }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+        .stat-label {
+            color: var(--secondary);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        .btn-success {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .table-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .table-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 24px;
+        }
+        .table-card .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .table-card .table { margin: 0; }
+        .table-card .table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 14px 20px;
+        }
+        .table-card .table td {
+            padding: 14px 20px;
+            border-color: #f1f5f9;
+            vertical-align: middle;
+        }
+        .badge-present {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-absent {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .quick-action {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .quick-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+        .quick-action i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        .quick-action h6 {
+            font-weight: 600;
+            margin: 0;
+            color: #1e293b;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .alert { border-radius: 12px; border: none; }
+        .modal-content { border-radius: 16px; border: none; }
+        .grade-a-plus { color: #166534; font-weight: 700; }
+        .grade-a { color: #15803d; font-weight: 600; }
+        .grade-b { color: #2563eb; font-weight: 600; }
+        .grade-c { color: #d97706; font-weight: 600; }
+        .grade-d { color: #b45309; font-weight: 600; }
+        .grade-f { color: #dc2626; font-weight: 700; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.role == 'teacher' %}
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h4><i class="fas fa-graduation-cap me-2"></i>School Manager</h4>
+            <small>{{ session.teacher_name or session.username }}</small>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="{{ url_for('main.dashboard') }}" class="nav-link {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.profile') }}" class="nav-link {% if request.endpoint == 'main.profile' %}active{% endif %}">
+                    <i class="fas fa-id-card"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.students') }}" class="nav-link {% if request.endpoint in ['main.students', 'main.student_profile'] %}active{% endif %}">
+                    <i class="fas fa-user-graduate"></i> Students
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.subjects') }}" class="nav-link {% if request.endpoint == 'main.subjects' %}active{% endif %}">
+                    <i class="fas fa-book-open"></i> Subjects
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.attendance') }}" class="nav-link {% if request.endpoint == 'main.attendance' %}active{% endif %}">
+                    <i class="fas fa-clipboard-check"></i> Attendance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.exams') }}" class="nav-link {% if request.endpoint in ['main.exams', 'main.enter_marks', 'main.exam_results'] %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i> Exams
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.results') }}" class="nav-link {% if request.endpoint in ['main.results'] %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i> Results
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.fees') }}" class="nav-link {% if request.endpoint == 'main.fees' %}active{% endif %}">
+                    <i class="fas fa-rupee-sign"></i> Fees
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.notes') }}" class="nav-link {% if request.endpoint == 'main.notes' %}active{% endif %}">
+                    <i class="fas fa-book"></i> Notes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.papers') }}" class="nav-link {% if request.endpoint == 'main.papers' %}active{% endif %}">
+                    <i class="fas fa-file-pdf"></i> Question Papers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('main.reports') }}" class="nav-link {% if request.endpoint == 'main.reports' %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </aside>
+    {% endif %}
+
+    <div class="main-content">
+        {% if session.role == 'teacher' %}
+        <div class="topbar">
+            <h5>{% block page_title %}Dashboard{% endblock %}</h5>
+            <div class="user-info">
+                <span class="text-muted">{{ session.teacher_name or session.username }}</span>
+                <div class="user-avatar">{{ (session.teacher_name or session.username)[0].upper() }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="content-area">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

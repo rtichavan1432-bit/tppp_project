@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Fees - School Manager{% endblock %}
+{% block page_title %}Fee Management{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="fw-bold m-0">Fee Collection</h5>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Roll</th>
+                    <th>Name</th>
+                    <th>Annual Fee</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fee in fees %}
+                <tr>
+                    <td>{{ fee.roll_no }}</td>
+                    <td><i class="fas fa-user text-muted me-2"></i>{{ fee.name }}</td>
+                    <td>
+                        {% if fee.annual_fee > 0 %}
+                            &#8377;{{ "{:,.0f}".format(fee.annual_fee) }}
+                        {% else %}
+                            <span class="text-muted">Not Set</span>
+                        {% endif %}
+                    </td>
+                    <td>&#8377;{{ "{:,.0f}".format(fee.paid_amount) }}</td>
+                    <td>
+                        {% if fee.balance > 0 %}
+                            <span class="text-danger fw-bold">&#8377;{{ "{:,.0f}".format(fee.balance) }}</span>
+                        {% else %}
+                            <span class="badge-present">Paid</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#feeModal{{ fee.student_id }}">
+                            <i class="fas fa-rupee-sign me-1"></i>Manage
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Fee Modal -->
+                <div class="modal fade" id="feeModal{{ fee.student_id }}">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold">Fee: {{ fee.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% if fee.annual_fee == 0 %}
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="set_annual">
+                                    <input type="hidden" name="student_id" value="{{ fee.student_id }}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Set Annual Fee (&#8377;)</label>
+                                        <input type="number" name="annual_fee" class="form-control" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Set Annual Fee</button>
+                                </form>
+                                {% else %}
+                                <div class="mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Annual Fee:</span><strong>&#8377;{{ "{:,.0f}".format(fee.annual_fee) }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Paid:</span><strong class="text-success">&#8377;{{ "{:,.0f}".format(fee.paid_amount) }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Balance:</span><strong class="text-danger">&#8377;{{ "{:,.0f}".format(fee.balance) }}</strong>
+                                    </div>
+                                </div>
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="collect">
+                                    <input type="hidden" name="fee_id" value="{{ fee.fee_id }}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Collect Amount (&#8377;)</label>
+                                        <input type="number" name="amount" class="form-control" max="{{ fee.balance }}" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">Collect Fee</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Results - Teacher Management Portal{% endblock %}
+{% block page_title %}Results{% endblock %}
+{% block content %}
+<div class="sheet-toolbar d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <form method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+        <select name="exam_id" class="form-select" style="min-width: 280px;">
+            <option value="">Select Exam</option>
+            {% for exam in exams %}
+            <option value="{{ exam.id }}" {% if selected_exam_id == exam.id %}selected{% endif %}>{{ exam.name }}{% if exam.exam_date %} - {{ exam.exam_date }}{% endif %}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Show Results</button>
+    </form>
+
+    {% if selected_exam %}
+    <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('main.report_exam_result', exam_id=selected_exam.id) }}" class="btn btn-success">
+            <i class="fas fa-file-excel me-1"></i>Export Exam Result
+        </a>
+        <a href="{{ url_for('main.report_students') }}" class="btn btn-outline-success">
+            <i class="fas fa-users me-1"></i>Consolidated Result
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% if selected_exam %}
+<div class="table-card">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <h5 class="m-0">{{ selected_exam.name }}</h5>
+            <small class="text-muted">Total possible per student: {{ selected_exam.max_marks }} x {{ subjects|length }} subjects</small>
+        </div>
+        <input type="search" id="resultSearch" class="form-control" style="min-width: 260px;" placeholder="Search student or roll no">
+    </div>
+    <div class="table-responsive">
+        <table class="table sticky-table mb-0">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Roll No</th>
+                    <th>Student Name</th>
+                    {% for subject in subjects %}
+                    <th>{{ subject.name }}</th>
+                    {% endfor %}
+                    <th>Total</th>
+                    <th>%</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results %}
+                <tr data-search="{{ row.roll_no }} {{ row.name|lower }}">
+                    <td class="fw-bold">#{{ row.rank }}</td>
+                    <td>{{ row.roll_no }}</td>
+                    <td>{{ row.name }}</td>
+                    {% for subject in row.subject_marks %}
+                    <td>{{ subject.marks if subject.marks is not none else '-' }}</td>
+                    {% endfor %}
+                    <td class="fw-bold">{{ row.total }}</td>
+                    <td>{{ row.percentage }}%</td>
+                    <td>
+                        <span class="grade-{{ 'a-plus' if row.grade == 'A+' else row.grade|lower }}">{{ row.grade }}</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{{ subjects|length + 7 }}" class="text-center text-muted py-5">No marks saved for this exam yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const searchBox = document.getElementById('resultSearch');
+    if (searchBox) {
+        searchBox.addEventListener('input', () => {
+            const term = searchBox.value.trim().toLowerCase();
+            document.querySelectorAll('tbody tr[data-search]').forEach((row) => {
+                row.style.display = row.dataset.search.includes(term) ? '' : 'none';
+            });
+        });
+    }
+</script>
+{% else %}
+<div class="table-card">
+    <div class="p-5 text-center">
+        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+        <h5 class="fw-bold">Select an exam to view results</h5>
+        <p class="text-muted mb-0">Results are calculated dynamically from the marks entered in the spreadsheet grid.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

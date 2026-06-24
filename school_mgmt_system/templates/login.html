@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Login - School Manager{% endblock %}
+{% block content %}
+<style>
+    body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .login-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .login-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+    .login-card h3 {
+        text-align: center;
+        color: #1e293b;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .login-card p {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 30px;
+    }
+    .login-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        color: white;
+        font-size: 1.8rem;
+    }
+    .role-toggle {
+        display: flex;
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 24px;
+    }
+    .role-toggle label {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        margin: 0;
+    }
+    .role-toggle input { display: none; }
+    .role-toggle input:checked + label {
+        background: #fff;
+        color: #2563eb;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-icon"><i class="fas fa-graduation-cap"></i></div>
+        <h3>School Manager</h3>
+        <p>Sign in to your account</p>
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="role-toggle">
+                <input type="radio" name="role" id="role-teacher" value="teacher" checked>
+                <label for="role-teacher"><i class="fas fa-chalkboard-teacher me-2"></i>Teacher</label>
+                <input type="radio" name="role" id="role-admin" value="admin">
+                <label for="role-admin"><i class="fas fa-user-shield me-2"></i>Admin</label>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-medium">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-medium">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="border-radius: 12px;">
+                Sign In <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">Default Admin: admin / admin123</small>
+        </div>
+    </div>
+</div>
+{% endblock %}

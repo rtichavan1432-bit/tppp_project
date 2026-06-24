@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block title %}Setup - Teacher Management Portal{% endblock %}
+{% block content %}
+<style>
+    .setup-wrapper {
+        max-width: 980px;
+        margin: 0 auto;
+    }
+    .setup-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 36px;
+        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+    }
+    .setup-step {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+    .step-number {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    .subject-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #eff6ff;
+        color: var(--primary);
+        border-radius: 999px;
+        padding: 8px 14px;
+        margin: 4px 8px 4px 0;
+        border: 1px solid #bfdbfe;
+    }
+    .subject-tag button {
+        border: 0;
+        background: transparent;
+        color: inherit;
+        padding: 0;
+        line-height: 1;
+    }
+    .subject-surface {
+        background: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 18px;
+        padding: 18px;
+    }
+</style>
+
+<div class="setup-wrapper">
+    <div class="setup-card">
+        <div class="text-center mb-4">
+            <div style="width: 78px; height: 78px; border-radius: 22px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+                <i class="fas fa-school"></i>
+            </div>
+            <h3 class="fw-bold mt-3 mb-2">First Login Setup</h3>
+            <p class="text-muted mb-0">Complete your profile, subjects, and starter students in one pass.</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('teacher.setup') }}">
+            <div class="setup-step">
+                <div class="step-number">1</div>
+                <div>
+                    <h5 class="mb-1">Teacher Information</h5>
+                    <p class="text-muted mb-0">Name, school, and phone number</p>
+                </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Teacher Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ teacher.name or '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">School Name</label>
+                    <input type="text" name="school_name" class="form-control" value="{{ teacher.school_name or '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" name="mobile" class="form-control" value="{{ teacher.mobile or '' }}" required>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <div class="step-number">2</div>
+                <div>
+                    <h5 class="mb-1">Class Setup</h5>
+                    <p class="text-muted mb-0">Class, division, and academic year</p>
+                </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Class</label>
+                    <input type="text" name="class_name" class="form-control" value="{{ teacher.class_name or '' }}" placeholder="e.g. 6th" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Division</label>
+                    <input type="text" name="division" class="form-control" value="{{ teacher.division or '' }}" placeholder="e.g. A" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Academic Year</label>
+                    <input type="text" name="academic_year" class="form-control" value="{{ teacher.academic_year or '' }}" placeholder="e.g. 2026-2027" required>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <div class="step-number">3</div>
+                <div>
+                    <h5 class="mb-1">Subjects</h5>
+                    <p class="text-muted mb-0">Add multiple subjects for this class, just like a real ERP class setup</p>
+                </div>
+            </div>
+            {% set existing_subjects = subjects | map(attribute='name') | list %}
+            <div class="subject-surface mb-4">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-8">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" id="subjectInput" class="form-control" placeholder="e.g. English, Maths, SST">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" id="addSubjectBtn" class="btn btn-outline-primary w-100">Add Subject</button>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="subjectList">
+                        {% for subject_name in existing_subjects %}
+                        <span class="subject-tag" data-subject="{{ subject_name|lower }}">
+                            {{ subject_name }}
+                            <input type="hidden" name="subjects" value="{{ subject_name }}">
+                            <button type="button" class="ms-1 remove-subject" aria-label="Remove subject">&times;</button>
+                        </span>
+                        {% endfor %}
+                    </div>
+                    <small class="text-muted d-block mt-2">Tip: Add only the subjects this class actually studies. These columns will appear automatically in marks entry and results.</small>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <div class="step-number">4</div>
+                <div>
+                    <h5 class="mb-1">Starter Students</h5>
+                    <p class="text-muted mb-0">Add a few students now or leave rows blank to skip</p>
+                </div>
+            </div>
+            <div class="table-responsive mb-4">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Student Name</th>
+                            <th>Father Name</th>
+                            <th>Mother Name</th>
+                            <th>Phone Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in range(6) %}
+                        {% set student = students[row] if row < students|length else none %}
+                        <tr>
+                            <td><input type="number" name="student_roll_no" class="form-control" value="{{ student.roll_no if student else '' }}" placeholder="1"></td>
+                            <td><input type="text" name="student_name" class="form-control" value="{{ student.name if student else '' }}" placeholder="Student name"></td>
+                            <td><input type="text" name="father_name" class="form-control" value="{{ student.father_name if student and student.father_name else '' }}" placeholder="Father name"></td>
+                            <td><input type="text" name="mother_name" class="form-control" value="{{ student.mother_name if student and student.mother_name else '' }}" placeholder="Mother name"></td>
+                            <td><input type="text" name="student_phone" class="form-control" value="{{ student.phone if student and student.phone else '' }}" placeholder="Phone number"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" style="border-radius: 14px;">
+                Complete Setup <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const subjectInput = document.getElementById('subjectInput');
+    const addSubjectBtn = document.getElementById('addSubjectBtn');
+    const subjectList = document.getElementById('subjectList');
+
+    function addSubject(subjectName) {
+        const name = subjectName.trim();
+        if (!name) {
+            return;
+        }
+
+        const normalized = name.toLowerCase();
+        const exists = Array.from(subjectList.querySelectorAll('[data-subject]')).some((item) => item.dataset.subject === normalized);
+        if (exists) {
+            subjectInput.value = '';
+            subjectInput.focus();
+            return;
+        }
+
+        const tag = document.createElement('span');
+        tag.className = 'subject-tag';
+        tag.dataset.subject = normalized;
+        tag.appendChild(document.createTextNode(name));
+
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'subjects';
+        hidden.value = name;
+        tag.appendChild(hidden);
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'ms-1 remove-subject';
+        removeButton.setAttribute('aria-label', 'Remove subject');
+        removeButton.textContent = '×';
+        tag.appendChild(removeButton);
+
+        subjectList.appendChild(tag);
+        subjectInput.value = '';
+        subjectInput.focus();
+    }
+
+    addSubjectBtn.addEventListener('click', () => addSubject(subjectInput.value));
+    subjectInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addSubject(subjectInput.value);
+        }
+    });
+
+    subjectList.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-subject')) {
+            event.target.closest('.subject-tag').remove();
+        }
+    });
+</script>
+{% endblock %}
