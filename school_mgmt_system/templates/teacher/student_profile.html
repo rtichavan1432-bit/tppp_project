@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }} - School Manager{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('main.students') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>Back to Students
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="stat-card text-center">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-size: 2rem;">
+                <i class="fas fa-user"></i>
+            </div>
+            <h4 class="fw-bold mb-1">{{ student.name }}</h4>
+            <p class="text-muted mb-3">Roll No: {{ student.roll_no }}</p>
+            <div class="d-flex justify-content-center gap-2">
+                <span class="badge bg-primary">Student</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stat-card text-center">
+                    <div class="stat-icon blue mx-auto"><i class="fas fa-clipboard-check"></i></div>
+                    <div class="stat-value">{{ attendance_pct }}%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card text-center">
+                    <div class="stat-icon green mx-auto"><i class="fas fa-rupee-sign"></i></div>
+                    <div class="stat-value">₹{{ "{:,.0f}".format(fee.paid_amount if fee else 0) }}</div>
+                    <div class="stat-label">Fees Paid</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card text-center">
+                    <div class="stat-icon orange mx-auto"><i class="fas fa-exclamation-circle"></i></div>
+                    <div class="stat-value">₹{{ "{:,.0f}".format(fee.annual_fee - fee.paid_amount if fee else 0) }}</div>
+                    <div class="stat-label">Fees Pending</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="m-0"><i class="fas fa-file-alt me-2 text-primary"></i>Exam Results</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Exam</th>
+                            <th>Marks</th>
+                            <th>Percentage</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in exam_results %}
+                        <tr>
+                            <td>{{ result.exam_name }}</td>
+                            <td>{{ result.marks_obtained }}/{{ result.max_marks }}</td>
+                            <td>{{ "%.1f"|format((result.marks_obtained / result.max_marks) * 100) }}%</td>
+                            <td>
+                                {% set pct = (result.marks_obtained / result.max_marks) * 100 %}
+                                {% if pct >= 90 %}<span class="grade-a-plus">A+</span>
+                                {% elif pct >= 80 %}<span class="grade-a">A</span>
+                                {% elif pct >= 70 %}<span class="grade-b">B</span>
+                                {% elif pct >= 60 %}<span class="grade-c">C</span>
+                                {% else %}<span class="grade-f">F</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center text-muted py-4">No exam results yet</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

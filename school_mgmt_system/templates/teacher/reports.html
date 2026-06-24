@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Reports - School Manager{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
+<div class="row g-4 justify-content-center" style="max-width: 800px; margin: 0 auto;">
+    <div class="col-md-4">
+        <a href="{{ url_for('main.report_attendance') }}" class="quick-action h-100">
+            <div class="stat-icon blue mx-auto"><i class="fas fa-clipboard-check"></i></div>
+            <h6 class="mt-3">Attendance Report</h6>
+            <p class="text-muted small mb-0">Download Excel</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('main.report_marks') }}" class="quick-action h-100">
+            <div class="stat-icon green mx-auto"><i class="fas fa-file-alt"></i></div>
+            <h6 class="mt-3">Marks Report</h6>
+            <p class="text-muted small mb-0">Download Excel</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{{ url_for('main.report_fees') }}" class="quick-action h-100">
+            <div class="stat-icon orange mx-auto"><i class="fas fa-rupee-sign"></i></div>
+            <h6 class="mt-3">Fees Report</h6>
+            <p class="text-muted small mb-0">Download Excel</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
